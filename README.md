@@ -85,27 +85,24 @@ class Anchor extends PHPX
 | `--out <dir>`   | Destination folder (default `src/Lib/PPIcons`).     |
 | `--force`       | Overwrite existing files.                           |
 
----
+## 📚 Documentation
 
-## 🏗️ How It Works
+For comprehensive guides and full documentation, visit the [ppicons](https://ppicons.tsnc.tech/) website
 
-1. The CLI hits your API at `https://ppicons.tsnc.tech`.
-2. The response (Brotli or Gzip) is decompressed automatically.
-3. For each icon the template `icon.stub.php` is filled and written to disk.
-4. A concise success/error summary is printed.
+## 💡 Contributing
 
-With `--all` the CLI performs **one single** `GET /icons/bulk` request and processes the returned array.
+We welcome contributions to improve `ppicons`. If you have ideas, found bugs, or want to make improvements, feel free to open an issue or submit a pull request on the repository.
 
 ---
 
-## 🤝 Contributing
+## 📄 License
 
-1. Fork the repo & create a branch (`feat/awesome-idea`).
-2. Run `npm run dev` for live rebuilding.
-3. Submit your pull request – stars ⭐ and issues are welcome!
+`ppicons` is under the MIT License. See LICENSE for details.
 
----
+## 👤 Author
 
-## 🪪 License
+This project is developed and maintained by [The Steel Ninja Code](https://thesteelninjacode.com/), continuously pushing the boundaries of PHP development.
 
-**MIT** © 2025 Jefferson Abraham / The Steel Ninja Code
+## 📧 Contact Us
+
+Got questions or feedback? Reach out to us at [thesteelninjacode@gmail.com](mailto:thesteelninjacode@gmail.com). We’d love to hear from you!
