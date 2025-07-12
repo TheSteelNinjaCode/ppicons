@@ -21,10 +21,10 @@
 
 ```bash
 # Global
-npm install -g ppicons-cli
+npm install -g ppicons
 
 # Or as a devDependency
-npm install -D ppicons-cli
+npm install -D ppicons
 ```
 
 > Requires **Node 18+** and a Prisma PHP project (PHP 8.2+).
