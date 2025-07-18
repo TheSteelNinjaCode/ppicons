@@ -12,7 +12,7 @@ const BULK_URL = "https://ppicons.tsnc.tech/icons?icon=all";
 async function generateAllIcons(targetDir, force = false) {
     const res = await (0, node_fetch_1.default)(BULK_URL);
     if (!res.ok)
-        throw new Error(`No se pudo obtener lista: ${res.status} – ${BULK_URL}`);
+        throw new Error(`Could not fetch list: ${res.status} – ${BULK_URL}`);
     const icons = (await res.json());
     console.log(`➡  Recibidos ${icons.length} iconos. Generando…`);
     const ok = [];
