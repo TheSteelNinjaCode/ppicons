@@ -11,8 +11,9 @@ const SINGLE_URL = "https://ppicons.tsnc.tech/icons";
 async function generateIcon(iconName, targetDir, force = false) {
     const url = `${SINGLE_URL}?icon=${encodeURIComponent(iconName)}`;
     const res = await (0, node_fetch_1.default)(url);
-    if (!res.ok)
-        throw new Error(`Could not fetch "${iconName}": ${res.status} – ${url}`);
+    if (!res.ok) {
+        throw new Error(`Could not fetch "${iconName}": ${res.statusText} – ${url}`);
+    }
     const iconJson = (await res.json());
     return (0, write_icon_1.writeIcon)(iconJson, targetDir, stub_path_1.STUB_PATH, force);
 }

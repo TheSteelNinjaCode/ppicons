@@ -1,6 +1,6 @@
 {
   "name": "ppicons",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "A package for generating Prisma PHP icons",
   "main": "index.js",
   "scripts": {

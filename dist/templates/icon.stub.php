@@ -1,6 +1,6 @@
 <?php
 
-namespace Lib\PPIcons;
+namespace __NAMESPACE__;
 
 use Lib\PHPX\PHPX;
 
@@ -16,7 +16,7 @@ class __COMPONENT_NAME__ extends PHPX
     public function render(): string
     {
         $attributes = $this->getAttributes();
-        $class = $this->getMergeClasses($this->class);
+        $class      = $this->getMergeClasses($this->class);
 
         return <<<HTML
         __SVG_CODE__

@@ -1,19 +1,21 @@
-# **ppicons-cli** — Instant PHPX Icon Generator 🚀
+# **ppicons‑cli** — Instant PHPX Icon Generator 🚀
 
 > **Generate fully‑typed PHPX icon components straight from the terminal.**
-> ⚡ **Single icon** → `npx ppicons add anchor`   |   🌌 **Whole library** → `npx ppicons add --all`
+>
+> ⚡ **Single icon** → `npx ppicons add anchor`    |    🌌 **Whole library** → `npx ppicons add --all`
 
 ---
 
 ## ✨ Features
 
-| Feature             | Details                                                                                                |
-| ------------------- | ------------------------------------------------------------------------------------------------------ |
-| **Bulk install**    | `--all` downloads >1 500 icons in a single compressed request.                                         |
-| **SVG → PHPX stub** | Replaces the native `class` attribute with `{$class}` and injects `{$attributes}` for Wave reactivity. |
-| **Clean paths**     | Files are created under `src/Lib/PPIcons/FancyName.php` with OS‑agnostic separators.                   |
-| **Friendly output** | Clear green/red summary, relative paths only.                                                          |
-| **Cross‑platform**  | Runs equally on Windows, macOS and Linux.                                                              |
+| Feature               | Details                                                                                                                    |
+| --------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| **Bulk install**      | `--all` downloads **1 500+** icons in a single compressed request.                                                         |
+| **SVG → PHPX stub**   | Replaces the native `class` attribute with `{$class}` and injects `{$attributes}` for Wave reactivity.                     |
+| **Clean PSR‑4 paths** | Files are written under `src/…` and their namespace is **auto‑derived** from the folder path, ready for Composer autoload. |
+| **Autoload‑safe**     | The generator refuses to write outside `src/`, so you’ll never break your PSR‑4 mapping by mistake.                        |
+| **Friendly output**   | Clear green / red summary with relative paths only.                                                                        |
+| **Cross‑platform**    | Works equally on Windows, macOS and Linux.                                                                                 |
 
 ---
 
@@ -23,11 +25,13 @@
 # Global
 npm install -g ppicons
 
-# Or as a devDependency
+# Or as a dev dependency
 npm install -D ppicons
 ```
 
-> Requires **Node 18+** and a Prisma PHP project (PHP 8.2+).
+> **Requirements**
+> • **Node 18+**
+> • A **Prisma PHP** project (PHP 8.2+) with the default `src/` directory mapped in `composer.json`.
 
 ---
 
@@ -40,11 +44,11 @@ npx ppicons add amphora
 # Add multiple icons at once
 npx ppicons add anchor globe rocket
 
-# Add the entire icon set (≈ 1 500+)
+# Add the entire icon set (≈ 1 500 icons)
 npx ppicons add --all
 ```
 
-CLI output example:
+Typical output:
 
 ```bash
 ✔ anchor  → src/Lib/PPIcons/Anchor.php
@@ -52,7 +56,7 @@ CLI output example:
 ✔ rocket  → src/Lib/PPIcons/Rocket.php
 ```
 
-Each generated file looks like this:
+Every generated component is ready to drop into your templates:
 
 ```php
 <?php
@@ -68,7 +72,7 @@ class Anchor extends PHPX
         $class      = $this->getMergeClasses();
 
         return <<<HTML
-        <svg {$attributes} class="{$class}" viewBox="0 0 24 24" …>…</svg>
+        <svg {$attributes} class="{$class}" viewBox="0 0 24 24">…</svg>
         HTML;
     }
 }
@@ -78,31 +82,58 @@ class Anchor extends PHPX
 
 ## 🔧 CLI Options
 
-| Flag / Argument | Description                                         |
-| --------------- | --------------------------------------------------- |
-| `<icon …>`      | One or more icon names separated by space or comma. |
-| `--all`         | Download the full catalogue in one request.         |
-| `--out <dir>`   | Destination folder (default `src/Lib/PPIcons`).     |
-| `--force`       | Overwrite existing files.                           |
+| Flag / Arg    | Description                                                                                                                         |
+| ------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| `<icon …>`    | One or more icon names separated by space or comma.                                                                                 |
+| `--all`       | Download the full catalogue in one request.                                                                                         |
+| `--out <dir>` | Destination **inside `src/`**.<br>Relative paths like `Lib/UI/Icons` or `src/Lib/UI/Icons` are accepted.<br>Default: `Lib/PPIcons`. |
+| `--force`     | Overwrite existing files.                                                                                                           |
 
-## 📚 Documentation
+### How `--out` works
 
-For comprehensive guides and full documentation, visit the [ppicons](https://ppicons.tsnc.tech/) website
+| Command example              | Destination path        | Resulting namespace |
+| ---------------------------- | ----------------------- | ------------------- |
+| _(no flag)_                  | `src/Lib/PPIcons/`      | `Lib\PPIcons`       |
+| `--out Lib/UI/Icons`         | `src/Lib/UI/Icons/`     | `Lib\UI\Icons`      |
+| `--out src/Lib/Custom/Icons` | `src/Lib/Custom/Icons/` | `Lib\Custom\Icons`  |
 
-## 💡 Contributing
+If the target directory resolves **outside `src/`**, the CLI aborts with:
 
-We welcome contributions to improve `ppicons`. If you have ideas, found bugs, or want to make improvements, feel free to open an issue or submit a pull request on the repository.
+```
+✖  --out must point to a folder inside «src».
+```
 
 ---
 
-## 📄 License
+## 🛠️ Troubleshooting
 
-`ppicons` is under the MIT License. See LICENSE for details.
+| Symptom                              | Likely cause & fix                                                        |
+| ------------------------------------ | ------------------------------------------------------------------------- |
+| _Undefined class_ in IDE after run   | Run `composer dump‑autoload` so Composer discovers the new namespaces.    |
+| CLI exits with “outside «src»” error | Adjust `--out` or move your project’s PSR‑4 root back to `src/`.          |
+| Same icon shows “skipped”            | Use `--force` to overwrite, or delete the file manually before re‑adding. |
 
-## 👤 Author
+---
 
-This project is developed and maintained by [The Steel Ninja Code](https://thesteelninjacode.com/), continuously pushing the boundaries of PHP development.
+## 📚 Further Reading
 
-## 📧 Contact Us
+Full docs & live preview at **[ppicons.tsnc.tech](https://ppicons.tsnc.tech/)**.
 
-Got questions or feedback? Reach out to us at [thesteelninjacode@gmail.com](mailto:thesteelninjacode@gmail.com). We’d love to hear from you!
+---
+
+## 💡 Contributing
+
+Pull requests are warmly welcome. Please open an issue before large changes so we can discuss the approach.
+
+---
+
+## 📄 License
+
+Released under the **MIT License**.
+
+---
+
+## 👤 Author
+
+**The Steel Ninja Code** — empowering PHP developers one package at a time.
+✉︎ [thesteelninjacode@gmail.com](mailto:thesteelninjacode@gmail.com)

@@ -9,6 +9,9 @@ const chalk_1 = __importDefault(require("chalk"));
 const path_1 = __importDefault(require("path"));
 const php_icon_1 = require("./generators/php-icon");
 const php_icons_bulk_1 = require("./generators/php-icons-bulk");
+/* ─────────────────────────────────────────────
+ * 0.  Entrypoint
+ * ──────────────────────────────────────────── */
 (async () => {
     const args = process.argv.slice(2);
     const [command, ...rest] = args;
@@ -16,9 +19,11 @@ const php_icons_bulk_1 = require("./generators/php-icons-bulk");
         console.log(chalk_1.default.blue("Usage: ppicons add [--all] [--out <dir>] [--force] <icon…>"));
         process.exit(0);
     }
-    /* ---------- parse flags & names ---------- */
+    /* ─────────────────────────────────────────────
+     * 1.  Parse flags + nombres de iconos
+     * ──────────────────────────────────────────── */
     const flags = { all: false, force: false, out: null };
-    const names = [];
+    const iconNames = [];
     for (let i = 0; i < rest.length; i++) {
         const tok = rest[i];
         switch (tok) {
@@ -29,39 +34,73 @@ const php_icons_bulk_1 = require("./generators/php-icons-bulk");
                 flags.force = true;
                 break;
             case "--out":
-                flags.out = rest[++i] || null;
+                flags.out = rest[++i] ?? null; // recibe argumento de ruta
                 break;
             default:
-                names.push(tok);
+                iconNames.push(tok);
         }
     }
-    /* ---------- destination directory ---------- */
-    const targetDir = path_1.default.resolve(flags.out ?? "src/Lib/PPIcons");
+    /* ─────────────────────────────────────────────
+     * 2.  Resolver directorio destino (siempre ↓ src/)
+     * ──────────────────────────────────────────── */
+    const projectRoot = process.cwd(); // raíz del paquete
+    const srcPath = path_1.default.resolve(projectRoot, "src"); // carpeta "src"
+    function resolveTargetDir(out) {
+        // a) Sin --out →  valor por defecto
+        if (!out)
+            return path_1.default.join(srcPath, "Lib/PPIcons");
+        const outNorm = path_1.default.normalize(out);
+        // b) Ruta absoluta → usar tal cual (se validará debajo)
+        if (path_1.default.isAbsolute(outNorm))
+            return outNorm;
+        // c) Ruta relativa
+        const firstSeg = outNorm.split(path_1.default.sep)[0];
+        if (firstSeg === "src") {
+            //  c1) El usuario ya incluye "src/…"  → concat a projectRoot
+            return path_1.default.join(projectRoot, outNorm);
+        }
+        //  c2) El usuario omite "src/"          → anidar dentro de src/
+        return path_1.default.join(srcPath, outNorm);
+    }
+    const targetDir = resolveTargetDir(flags.out);
+    /* ─── Validaciones ────────────────────────── */
+    const insideSrc = targetDir === srcPath || targetDir.startsWith(srcPath + path_1.default.sep);
+    if (!insideSrc) {
+        console.error(chalk_1.default.red("✖  --out debe ser una ruta dentro de «src»."));
+        process.exit(1);
+    }
+    if (targetDir === srcPath) {
+        console.error(chalk_1.default.red("✖  No se puede generar directamente en «src». Usa un sub‑directorio."));
+        process.exit(1);
+    }
+    /* ─────────────────────────────────────────────
+     * 3.  Generación (bulk o individual)
+     * ──────────────────────────────────────────── */
     try {
-        /* -------- bulk mode -------- */
+        /* -------- bulk (--all) -------- */
         if (flags.all) {
             const { ok, fail } = await (0, php_icons_bulk_1.generateAllIcons)(targetDir, flags.force);
-            console.log(chalk_1.default.green(`\n✔ Generated ${ok.length} icons in ${path_1.default.relative(process.cwd(), targetDir)}`));
+            console.log(chalk_1.default.green(`\n✔ Generated ${ok.length} icons in ${path_1.default.relative(projectRoot, targetDir)}`));
             if (fail.length) {
                 console.log(chalk_1.default.red(`✖ Failed ${fail.length}`));
                 fail.forEach((m) => console.log("  •", m));
             }
             process.exit(fail.length ? 1 : 0);
         }
-        /* -------- single / multiple names -------- */
-        if (names.length === 0) {
+        /* -------- uno / varios nombres -------- */
+        if (iconNames.length === 0) {
             const { iconList } = await (0, prompts_1.default)({
                 type: "text",
                 name: "iconList",
                 message: "Which icons do you want? (space or comma)",
                 validate: (v) => (v.trim() ? true : "Enter at least one name"),
             });
-            names.push(...iconList.split(/[\s,]+/));
+            iconNames.push(...iconList.split(/[\s,]+/));
         }
-        for (const name of names) {
+        for (const name of iconNames) {
             const savedAbs = await (0, php_icon_1.generateIcon)(name, targetDir, flags.force);
-            const rel = path_1.default.relative(process.cwd(), savedAbs).replace(/\\/g, "/");
-            console.log(chalk_1.default.green(`✔ ${name} → ${rel}`));
+            const relPath = path_1.default.relative(projectRoot, savedAbs).replace(/\\/g, "/");
+            console.log(chalk_1.default.green(`✔ ${name} → ${relPath}`));
         }
     }
     catch (err) {
