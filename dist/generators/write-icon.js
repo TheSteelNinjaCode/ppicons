@@ -12,19 +12,15 @@ function buildNamespace(targetDir) {
     const projectRoot = process.cwd();
     const srcPath = path_1.default.resolve(projectRoot, "src");
     const rel = path_1.default.relative(srcPath, targetDir);
+    // ── guard rails ───────────────────────────────────────────────────────────
     if (rel.startsWith("..") || path_1.default.isAbsolute(rel)) {
-        throw new Error(`The target directory must be inside "src". ` +
-            `Received path: ${targetDir}`);
+        throw new Error(`The target directory must be inside "src". Received: ${targetDir}`);
     }
-    // 2) Is it pointing exactly to "src"? (empty namespace) → explicit error
     if (rel === "") {
-        throw new Error(`Cannot generate directly in "src". ` +
-            `Please specify a subdirectory like "src/Lib/PPIcons".`);
+        throw new Error(`Cannot generate directly in "src". Use a subdirectory such as "src/Lib/PPIcons".`);
     }
-    return rel
-        .split(path_1.default.sep)
-        .map((seg) => (0, change_case_1.pascalCase)(seg))
-        .join("\\"); // "Lib\\PPIcons"
+    // ── no re-casing here – just mirror the directory structure ──────────────
+    return rel.split(path_1.default.sep).join("\\"); // e.g. "Lib\\PPIcons"
 }
 async function writeIcon(iconJson, targetDir, stubPath, force = false) {
     const component = (0, change_case_1.pascalCase)(iconJson.componentName || iconJson.name);
