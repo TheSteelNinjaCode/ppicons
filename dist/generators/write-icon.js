@@ -35,8 +35,9 @@ async function writeIcon(iconJson, targetDir, stubPath, force = false) {
     }
     const stub = await fs_extra_1.default.readFile(stubPath, "utf8");
     const svgClean = iconJson.svg
-        .replace(/\sclass="[^"]*"/, "")
-        .replace("<svg ", '<svg class="{$class}" {$attributes} ');
+        .replace(/\s(?:width|height)="[^"]*"/g, "")
+        .replace(/\sclass="[^"]*"/g, "")
+        .replace(/(<svg\b[^>]*?)(>)/, '$1 class="{$class}" {$attributes}$2');
     const content = stub
         .replace(/__NAMESPACE__/g, namespace)
         .replace(/__COMPONENT_NAME__/g, component)
