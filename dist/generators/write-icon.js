@@ -12,14 +12,12 @@ function buildNamespace(targetDir) {
     const projectRoot = process.cwd();
     const srcPath = path_1.default.resolve(projectRoot, "src");
     const rel = path_1.default.relative(srcPath, targetDir);
-    // ── guard rails ───────────────────────────────────────────────────────────
     if (rel.startsWith("..") || path_1.default.isAbsolute(rel)) {
         throw new Error(`The target directory must be inside "src". Received: ${targetDir}`);
     }
     if (rel === "") {
         throw new Error(`Cannot generate directly in "src". Use a subdirectory such as "src/Lib/PPIcons".`);
     }
-    // ── no re-casing here – just mirror the directory structure ──────────────
     return rel.split(path_1.default.sep).join("\\"); // e.g. "Lib\\PPIcons"
 }
 async function writeIcon(iconJson, targetDir, stubPath, force = false) {
@@ -31,9 +29,13 @@ async function writeIcon(iconJson, targetDir, stubPath, force = false) {
     }
     const stub = await fs_extra_1.default.readFile(stubPath, "utf8");
     const svgClean = iconJson.svg
-        .replace(/\s(?:width|height)="[^"]*"/g, "")
-        .replace(/\sclass="[^"]*"/g, "")
-        .replace(/(<svg\b[^>]*?)(>)/, '$1 class="{$class}" {$attributes}$2');
+        // Only touch the outer <svg> tag
+        .replace(/<svg\b([^>]*)>/, (_, attrs) => {
+        const cleaned = attrs.replace(/\s(?:width|height|class)="[^"]*"/g, "");
+        return `<svg${cleaned} class="{$class}" {$attributes}>`;
+    })
+        // Expand common self-closing SVG elements
+        .replace(/<(rect|path|circle|line|polyline|polygon|ellipse)\b([^>]*)\/>/g, "<$1$2></$1>");
     const content = stub
         .replace(/__NAMESPACE__/g, namespace)
         .replace(/__COMPONENT_NAME__/g, component)
