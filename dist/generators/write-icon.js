@@ -32,7 +32,7 @@ async function writeIcon(iconJson, targetDir, stubPath, force = false) {
         // Only touch the outer <svg> tag
         .replace(/<svg\b([^>]*)>/, (_, attrs) => {
         const cleaned = attrs.replace(/\s(?:width|height|class)="[^"]*"/g, "");
-        return `<svg${cleaned} class="{$class}" {$attributes}>`;
+        return `<svg${cleaned} {$attributes}>`;
     })
         // Expand common self-closing SVG elements
         .replace(/<(rect|path|circle|line|polyline|polygon|ellipse)\b([^>]*)\/>/g, "<$1$2></$1>");
