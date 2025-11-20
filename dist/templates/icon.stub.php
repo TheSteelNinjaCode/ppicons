@@ -15,7 +15,7 @@ class __COMPONENT_NAME__ extends PHPX
 
     public function render(): string
     {
-        $class = $this->getMergeClasses("size-24", $this->class);
+        $class = $this->getMergeClasses($this->class);
         $attributes = $this->getAttributes([
             'class' => $class,
         ]);
