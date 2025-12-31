@@ -1,12 +1,1 @@
-"use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.STUB_PATH = void 0;
-const path_1 = __importDefault(require("path"));
-/**
- * Absolute path to templates/icon.stub.php inside this package.
- * Works in dev (src) and after build (dist).
- */
-exports.STUB_PATH = path_1.default.resolve(__dirname, "../templates/icon.stub.php");
+import path from"node:path";import{fileURLToPath}from"node:url";const __filename=fileURLToPath(import.meta.url),__dirname=path.dirname(__filename);export const STUB_PATH_PHP=path.resolve(__dirname,"../templates/icon.stub.php");export const STUB_PATH_PYTHON=path.resolve(__dirname,"../templates/icon.stub.py");

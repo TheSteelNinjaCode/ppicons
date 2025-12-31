@@ -1,135 +1,197 @@
-# **ppicons‑cli** — Instant PHPX Icon Generator 🚀
+# **ppicons-cli** — Icon Components for **Prisma PHP** and **Caspian Python**
 
-> **Generate fully‑typed PHPX icon components straight from the terminal.**
->
-> ⚡ **Single icon** → `npx ppicons add anchor`    |    🌌 **Whole library** → `npx ppicons add --all`
+Generate ready-to-use icon components (PHPX for PHP, and Python components for Caspian) directly from the terminal—no manual SVG copy/paste, no inconsistent markup, no “where did this icon come from?” drift.
 
----
-
-## ✨ Features
-
-| Feature               | Details                                                                                                                    |
-| --------------------- | -------------------------------------------------------------------------------------------------------------------------- |
-| **Bulk install**      | `--all` downloads **1 500+** icons in a single compressed request.                                                         |
-| **SVG → PHPX stub**   | Replaces the native `class` attribute with `{$class}` and injects `{$attributes}` for Wave reactivity.                     |
-| **Clean PSR‑4 paths** | Files are written under `src/…` and their namespace is **auto‑derived** from the folder path, ready for Composer autoload. |
-| **Autoload‑safe**     | The generator refuses to write outside `src/`, so you’ll never break your PSR‑4 mapping by mistake.                        |
-| **Friendly output**   | Clear green / red summary with relative paths only.                                                                        |
-| **Cross‑platform**    | Works equally on Windows, macOS and Linux.                                                                                 |
+> Single icon: `npx ppicons add anchor`  
+> Full library: `npx ppicons add --all`
 
 ---
 
-## 📦 Installation
+## Why this exists
+
+When you build UI systems (Prisma PHP / PHPXUI, or Caspian’s HTML-first Python stack), icons tend to become a maintenance tax:
+
+- SVGs copied from random sources end up inconsistent (attributes, sizing, classes).
+- Designers/devs tweak icons inline and the changes are never reusable.
+- Autocomplete and static analysis can’t help you when icons are plain strings.
+
+**ppicons-cli** turns icons into **first-class components** so your UI stays consistent and your DX improves immediately.
+
+---
+
+## Features
+
+| Capability                 | What you get                                                                                   |
+| -------------------------- | ---------------------------------------------------------------------------------------------- |
+| **Single icon generation** | `ppicons add <name>` downloads and writes one component file.                                  |
+| **Bulk generation**        | `--all` generates the entire icon set in one run (hundreds / thousands depending on upstream). |
+| **Dual language support**  | **PHP mode** (Prisma PHP / PHPX) and **Python mode** (Caspian).                                |
+| **Auto-detect language**   | Detects project type automatically: `caspian.config.json` → Python, `prisma-php.json` → PHP.   |
+| **Force overwrite**        | `--force` overwrites existing files safely when you want to refresh.                           |
+| **Clean component names**  | Converts icon names to **PascalCase** (e.g. `chevron-right` → `ChevronRight`).                 |
+| **SVG normalization**      | Injects dynamic attributes and normalizes common SVG quirks (safer parsing / rendering).       |
+
+---
+
+## Requirements
+
+- Node.js (recommended: modern LTS)
+- Network access to fetch icons from the upstream endpoint used by the CLI
+
+---
+
+## Quick start
+
+### 1) Generate a single icon
 
 ```bash
-# Global
-npm install -g ppicons
-
-# Or as a dev dependency
-npm install -D ppicons
+npx ppicons add anchor
 ```
 
-> **Requirements**
-> • **Node 18+**
-> • A **Prisma PHP** project (PHP 8.2+) with the default `src/` directory mapped in `composer.json`.
-
----
-
-## 🚀 Quick Start
+### 2) Generate the full icon library
 
 ```bash
-# Add a single icon
-npx ppicons add amphora
-
-# Add multiple icons at once
-npx ppicons add anchor globe rocket
-
-# Add the entire icon set (≈ 1 500 icons)
 npx ppicons add --all
 ```
 
-Typical output:
+### 3) Overwrite existing icons
 
 ```bash
-✔ anchor  → src/Lib/PPIcons/Anchor.php
-✔ globe   → src/Lib/PPIcons/Globe.php
-✔ rocket  → src/Lib/PPIcons/Rocket.php
-```
-
-Every generated component is ready to drop into your templates:
-
-```php
-<?php
-namespace Lib\PPIcons;
-
-use Lib\PHPX\PHPX;
-
-class Anchor extends PHPX
-{
-    public function render(): string
-    {
-        $attributes = $this->getAttributes();
-        $class      = $this->getMergeClasses();
-
-        return <<<HTML
-        <svg {$attributes} class="{$class}" viewBox="0 0 24 24">…</svg>
-        HTML;
-    }
-}
+npx ppicons add anchor --force
+# or
+npx ppicons add --all --force
 ```
 
 ---
 
-## 🔧 CLI Options
+## Language selection (PHP vs Python)
 
-| Flag / Arg    | Description                                                                                                                         |
-| ------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
-| `<icon …>`    | One or more icon names separated by space or comma.                                                                                 |
-| `--all`       | Download the full catalogue in one request.                                                                                         |
-| `--out <dir>` | Destination **inside `src/`**.<br>Relative paths like `Lib/UI/Icons` or `src/Lib/UI/Icons` are accepted.<br>Default: `Lib/PPIcons`. |
-| `--force`     | Overwrite existing files.                                                                                                           |
+The CLI supports:
 
-### How `--out` works
+- `--lang php` → generate **PHPX** components (Prisma PHP ecosystem)
+- `--lang py` → generate **Python** components (Caspian ecosystem)
 
-| Command example              | Destination path        | Resulting namespace |
-| ---------------------------- | ----------------------- | ------------------- |
-| _(no flag)_                  | `src/Lib/PPIcons/`      | `Lib\PPIcons`       |
-| `--out Lib/UI/Icons`         | `src/Lib/UI/Icons/`     | `Lib\UI\Icons`      |
-| `--out src/Lib/Custom/Icons` | `src/Lib/Custom/Icons/` | `Lib\Custom\Icons`  |
+### Auto-detection
 
-If the target directory resolves **outside `src/`**, the CLI aborts with:
+If you do **not** pass `--lang`, ppicons-cli attempts to pick the right mode:
 
+1. If `caspian.config.json` exists in the project root → **Python mode**
+2. Else if `prisma-php.json` exists in the project root → **PHP mode**
+3. Else → defaults to **PHP mode**
+
+This makes it seamless to use inside Caspian projects without extra flags.
+
+### Explicit mode examples
+
+```bash
+# Force Python output
+npx ppicons add user --lang py
+
+# Force PHP output
+npx ppicons add user --lang php
 ```
-✖  --out must point to a folder inside «src».
+
+---
+
+## Output paths and project-safe defaults
+
+### Default output locations
+
+If you do not pass `--out`:
+
+- **PHP mode** writes to: `src/Lib/PPIcons/`
+- **Python mode** writes to: `src/lib/ppicons/`
+
+### Custom output directory
+
+Use `--out` to control where generated files land.
+
+```bash
+# PHP: relative to src/ by default
+npx ppicons add anchor --lang php --out Lib/UI/Icons
+
+# PHP: explicit src/ path also supported
+npx ppicons add anchor --lang php --out src/Lib/Custom/Icons
+
+# Python: relative to project root
+npx ppicons add anchor --lang py --out src/app/icons
 ```
 
----
+### Important safety rules
 
-## 🛠️ Troubleshooting
+- **PHP mode** requires `--out` to resolve **inside `src/`**.  
+  This prevents breaking PSR-4 mappings by accidentally writing outside your autoload root.
+- The generator refuses to write directly into `src/` (choose a subfolder).
 
-| Symptom                              | Likely cause & fix                                                        |
-| ------------------------------------ | ------------------------------------------------------------------------- |
-| _Undefined class_ in IDE after run   | Run `composer dump‑autoload` so Composer discovers the new namespaces.    |
-| CLI exits with “outside «src»” error | Adjust `--out` or move your project’s PSR‑4 root back to `src/`.          |
-| Same icon shows “skipped”            | Use `--force` to overwrite, or delete the file manually before re‑adding. |
+If you violate the PHP constraint, the CLI exits with a clear error.
 
 ---
 
-## 📚 Further Reading
+## Usage reference
 
-Full docs & live preview at **[ppicons.tsnc.tech](https://ppicons.tsnc.tech/)**.
+```bash
+npx ppicons add <icon-name> [--all] [--force] [--lang php|py] [--out <path>]
+```
+
+### Flags
+
+- `--all` — generate all icons
+- `--force` — overwrite existing files
+- `--lang php|py` — explicitly choose output language
+- `--out <path>` — output directory (see rules above)
 
 ---
 
-## 💡 Contributing
+## Using the generated icons
 
-Pull requests are warmly welcome. Please open an issue before large changes so we can discuss the approach.
+Because the generated artifacts are **real components**, you get:
+
+- consistent sizing and attribute handling
+- editor support (rename, search, “go to definition”, etc.)
+- fewer UI regressions from inconsistent SVG markup
+
+### Python (Caspian)
+
+Icons are generated as `.py` modules using PascalCase filenames, under the Python default folder (`src/lib/ppicons/`) unless overridden.
+
+Typical imports depend on your project’s Python import path setup, but the intended usage is:
+
+- treat the icon as a component/function
+- pass standard attributes (class, width/height, etc.) via the component’s attribute mechanism defined by your stub
+
+### PHP (Prisma PHP / PHPX)
+
+Icons are generated into `src/Lib/PPIcons/` (unless overridden) with a namespace derived from the folder structure.
+
+The stub is designed so icons behave like standard PHPX components and accept attributes cleanly.
 
 ---
 
-## 📄 License
+## Troubleshooting
 
-Released under the **MIT License**.
+### “Detected caspian.config.json: Using Python mode” but I wanted PHP
+
+Pass `--lang php` explicitly:
+
+```bash
+npx ppicons add anchor --lang php
+```
+
+### My icons didn’t overwrite
+
+Use `--force`:
+
+```bash
+npx ppicons add --all --force
+```
+
+### Network errors fetching icons
+
+The CLI fetches icon JSON from the upstream endpoint. Confirm:
+
+- you have internet access
+- your firewall/proxy allows Node fetch requests
+- the icon name exists upstream
 
 ---
 
@@ -137,3 +199,7 @@ Released under the **MIT License**.
 
 **The Steel Ninja Code** — empowering PHP developers one package at a time.
 ✉︎ [thesteelninjacode@gmail.com](mailto:thesteelninjacode@gmail.com)
+
+## License
+
+Released under the **MIT License**.
