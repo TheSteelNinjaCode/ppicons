@@ -35,7 +35,7 @@ UI icon usage gets messy fast when SVGs are copied inline across templates and c
 | Dual language support  | PHP mode for Prisma PHP / PHPX and Python mode for Caspian.                 |
 | Auto-detect language   | Detects `caspian.config.json` for Python or `prisma-php.json` for PHP.      |
 | Force overwrite        | `--force` overwrites existing generated files.                              |
-| AI-aware outputs       | Writes `ppicons.json`, `.github/copilot-instructions.md`, and `AGENTS.md`.  |
+| AI-aware outputs       | Writes `ppicons.json` and `.github/instructions/ppicons.instructions.md`.  |
 | Catalog discovery      | Documents and exposes the remote icon catalog endpoints used by the CLI.    |
 
 ## Requirements
@@ -170,7 +170,9 @@ Every successful `add` or `update` refreshes project metadata files that help ed
 This file is the core machine-readable inventory. It includes:
 
 - project type and language mode
+- framework and framework config metadata
 - icon output directory
+- manifest and component directory paths for AI tooling
 - supported `ppicons` commands
 - remote catalog API endpoints
 - installed icon inventory
@@ -180,17 +182,20 @@ Example:
 
 ```json
 {
-  "schemaVersion": 4,
+  "schemaVersion": 5,
   "generatedAt": "2026-04-19T00:00:00.000Z",
   "project": {
     "type": "prisma-php",
+    "framework": "prisma-php",
     "language": "php",
     "detectedBy": "prisma-php.json",
     "rootDirectory": ".",
     "sourceDirectory": "src",
+    "configFile": "prisma-php.json",
+    "manifestFile": "ppicons.json",
+    "componentsDirectory": "src/Lib/PPIcons",
     "iconsDirectory": "src/Lib/PPIcons",
-    "copilotInstructionsFile": ".github/copilot-instructions.md",
-    "agentsFile": "AGENTS.md"
+    "copilotInstructionsFile": ".github/instructions/ppicons.instructions.md"
   },
   "commands": {
     "addOne": "npx ppicons add <icon-name>",
@@ -224,24 +229,22 @@ Example:
 }
 ```
 
-### `.github/copilot-instructions.md`
+### `.github/instructions/ppicons.instructions.md`
 
-This file is generated for GitHub Copilot. It includes:
+This dedicated instruction file is generated for GitHub Copilot. It includes:
 
 - install commands for new icons
 - icon discovery API guidance
 - project-specific usage examples
 - notes about the current icon directory and import entry
 
-The `ppicons` section is managed automatically so it can be refreshed safely.
+The file includes instruction frontmatter plus a managed `ppicons` block so it can be refreshed safely without taking over `.github/copilot-instructions.md`.
 
-### `AGENTS.md`
+### `.github/copilot-instructions.md`
 
-This file is generated in the project root for AI agents that automatically read root-level instruction files.
+This top-level file is left available for project-owned, always-on Copilot notes. `ppicons` does not generate or overwrite it.
 
-It contains the same `ppicons` AI context as the Copilot instructions file, including install commands, discovery guidance, and rendering examples.
-
-The `ppicons` section is also managed automatically so existing user-authored notes outside the managed block stay intact.
+If you want `ppicons` guidance for Copilot, use the dedicated `.github/instructions/ppicons.instructions.md` file instead.
 
 ## Icon discovery API
 
