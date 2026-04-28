@@ -1,50 +1,31 @@
-# ppicons-cli
+# ppicons
 
 Generate reusable icon components for Prisma PHP and Caspian projects from the terminal.
 
-Instead of copying SVG markup by hand, `ppicons` downloads icon definitions from the remote catalog, normalizes the SVG, writes framework-friendly component files, and refreshes AI-aware metadata files in the target project.
+`ppicons` downloads icon definitions from the remote catalog, normalizes the SVG, writes framework-native component files, and refreshes project metadata that documents the installed icon set.
 
-Quick examples:
+The current component contract is HTML-first usage with `x-` tags:
 
-```bash
-npx ppicons add search
-npx ppicons add anchor globe rocket
-npx ppicons add --all
-npx ppicons update
+```html
+<x-search /> <x-arrow-right class="size-4" />
 ```
 
-## Why use it
+## What it does
 
-UI icon usage gets messy fast when SVGs are copied inline across templates and components.
-
-`ppicons` solves that by turning icons into first-class components:
-
-- one source of truth per installed icon
-- consistent SVG normalization and attribute handling
-- predictable file names and import paths
-- easier refactoring, reuse, and search in the editor
-- machine-readable and AI-readable project metadata
-
-## Features
-
-| Capability             | What you get                                                                |
-| ---------------------- | --------------------------------------------------------------------------- |
-| Single icon generation | `ppicons add <name>` downloads and writes one component file.               |
-| Bulk generation        | `ppicons add --all` generates the full icon catalog in one run.             |
-| Update installed icons | `ppicons update` refreshes only the icons already installed in the project. |
-| Dual language support  | PHP mode for Prisma PHP / PHPX and Python mode for Caspian.                 |
-| Auto-detect language   | Detects `caspian.config.json` for Python or `prisma-php.json` for PHP.      |
-| Force overwrite        | `--force` overwrites existing generated files.                              |
-| AI-aware outputs       | Writes `ppicons.json` and `.github/instructions/ppicons.instructions.md`.  |
-| Catalog discovery      | Documents and exposes the remote icon catalog endpoints used by the CLI.    |
+- Generates PHP icon components for Prisma PHP projects.
+- Generates Python icon components for Caspian projects.
+- Supports single-icon installs, multi-icon installs, and full-catalog generation.
+- Updates already-installed icons by reading the generated component filenames.
+- Refreshes `ppicons.json` and `.github/instructions/ppicons.instructions.md` after successful add or update runs.
+- Keeps generated icon usage aligned with HTML-first `x-` tag output.
 
 ## Requirements
 
 - Node.js 18+
 - Network access to `https://ppicons.tsnc.tech`
-- A Prisma PHP project or a Caspian project when using the generated components in a real app
+- A target project with either `prisma-php.json` or `caspian.config.json` when using auto-detection
 
-## Installation
+## Install
 
 Global install:
 
@@ -58,132 +39,141 @@ Local dev dependency:
 npm install -D ppicons
 ```
 
-## Commands
+## CLI
 
-### Add one icon
+Usage:
+
+```bash
+ppicons <command> [--all] [--lang py|php] [--force] [icon...]
+```
+
+Commands:
+
+- `add` installs one or more new icons.
+- `update` refreshes icons already present in the default generated directory.
+
+Examples:
 
 ```bash
 npx ppicons add search
-```
-
-### Add multiple icons
-
-```bash
 npx ppicons add search user settings
-```
-
-### Add the full icon set
-
-```bash
 npx ppicons add --all
-```
-
-### Update installed icons
-
-```bash
-npx ppicons update
-```
-
-### Force overwrite
-
-```bash
 npx ppicons add search --force
-npx ppicons add --all --force
+npx ppicons update
 ```
 
 ## Flags
 
-| Flag         | Description                                  |
-| ------------ | -------------------------------------------- |
-| `--all`      | Generate every icon from the remote catalog. |
-| `--force`    | Overwrite existing generated icon files.     |
-| `--lang php` | Force Prisma PHP / PHPX output.              |
-| `--lang py`  | Force Caspian Python output.                 |
+| Flag         | Description                                     |
+| ------------ | ----------------------------------------------- |
+| `--all`      | Generate every icon available from the catalog. |
+| `--force`    | Overwrite existing generated files.             |
+| `--lang php` | Force Prisma PHP output.                        |
+| `--lang py`  | Force Caspian Python output.                    |
 
-## Language selection
+## Language detection
 
-If you do not pass `--lang`, `ppicons` auto-detects the target mode using the project root:
+If `--lang` is not passed, `ppicons` resolves the output mode from the current project root:
 
 1. If `caspian.config.json` exists, it uses Python mode.
 2. Else if `prisma-php.json` exists, it uses PHP mode.
 3. Else it falls back to PHP mode.
 
-Explicit examples:
+Examples:
 
 ```bash
 npx ppicons add search --lang php
 npx ppicons add search --lang py
 ```
 
-## Generated output locations
+## Generated output
 
-By default, `ppicons` writes icon components into `src` based on the selected language mode.
+`ppicons` writes generated icons into the `src` tree of the current project.
 
-| Mode              | Output directory  |
-| ----------------- | ----------------- |
-| Prisma PHP / PHPX | `src/Lib/PPIcons` |
-| Caspian Python    | `src/lib/ppicons` |
+| Mode       | Output directory  | File pattern                          |
+| ---------- | ----------------- | ------------------------------------- |
+| Prisma PHP | `src/Lib/PPIcons` | `src/Lib/PPIcons/<ComponentName>.php` |
+| Caspian    | `src/lib/ppicons` | `src/lib/ppicons/<ComponentName>.py`  |
 
-The generator converts icon names to PascalCase component file names.
+Component file names are PascalCase, while runtime usage stays kebab-case with the `x-` prefix.
 
 Examples:
 
-- `search` -> `Search.php` or `Search.py`
-- `chevron-right` -> `ChevronRight.php` or `ChevronRight.py`
+- `search` becomes `Search.php` or `Search.py`
+- `arrow-right` becomes `ArrowRight.php` or `ArrowRight.py`
+- usage becomes `<x-search />` or `<x-arrow-right />`
 
 ## Using generated icons
 
-### Prisma PHP / PHPX
+Generated icons are consumed as HTML-first `x-` components.
 
-Generated PHP icons are class-based components and are intended to be used with JSX-like tags.
+### Prisma PHP
+
+Import the generated classes into the PHP file, then render the icon with the `x-` tag.
 
 ```php
 <?php
 
 use Lib\PPIcons\Search;
+use Lib\PPIcons\ArrowRight;
 
 ?>
 
-<Search />
-<Search class="size-4" />
+<x-search />
+<x-arrow-right class="size-4" />
+```
+
+When multiple icons come from the same generated namespace, grouped imports are preferred:
+
+```php
+<?php
+
+use Lib\PPIcons\{ArrowRight, Mail, UserRound};
+
+?>
+
+<div>
+    <x-mail class="size-4" />
+    <x-user-round class="size-4" />
+    <x-arrow-right class="size-4" />
+</div>
 ```
 
 ### Caspian
 
-Generated Caspian icons are Python components and are intended to be used with JSX-like tags inside templates.
+Import the generated components in the template, then render them with the same `x-` tags.
 
 ```html
-<!-- @import { Search } from ../../lib/ppicons -->
+<!-- @import { Search, ArrowRight } from ../../lib/ppicons -->
 
-<search />
-<search class="size-4" />
+<x-search />
+<x-arrow-right class="size-4" />
 ```
 
-Adjust the relative import path to match the location of the current template.
+Adjust the relative import path so it points to `src/lib/ppicons` from the current template.
 
-## AI-aware project files
+## Metadata files
 
-Every successful `add` or `update` refreshes project metadata files that help editors, scripts, and AI tools understand the icon setup.
+Every successful `add` or `update` refreshes two project files.
 
 ### `ppicons.json`
 
-This file is the core machine-readable inventory. It includes:
+This is the machine-readable manifest for the installed icon set. It includes:
 
-- project type and language mode
-- framework and framework config metadata
-- icon output directory
-- manifest and component directory paths for AI tooling
-- supported `ppicons` commands
-- remote catalog API endpoints
-- installed icon inventory
-- import entry metadata for the current project mode
+- `schemaVersion: 6`
+- detected project type, framework, language, and config file
+- generated component and icon directories
+- canonical command strings for add/update workflows
+- remote catalog API metadata
+- usage metadata for the current target
+- the installed icon inventory
 
 Example:
 
 ```json
 {
-  "schemaVersion": 5,
-  "generatedAt": "2026-04-19T00:00:00.000Z",
+  "schemaVersion": 6,
+  "generatedAt": "2026-04-28T00:00:00.000Z",
   "project": {
     "type": "prisma-php",
     "framework": "prisma-php",
@@ -203,70 +193,52 @@ Example:
     "addAll": "npx ppicons add --all",
     "updateInstalled": "npx ppicons update"
   },
-  "catalogApi": {
-    "listAll": {
-      "method": "GET",
-      "url": "https://ppicons.tsnc.tech/icons?icon=all",
-      "returns": "IconRecord[]",
-      "purpose": "List all available icons that can be installed."
-    },
-    "getOne": {
-      "method": "GET",
-      "urlTemplate": "https://ppicons.tsnc.tech/icons?icon=<icon-name>",
-      "exampleUrl": "https://ppicons.tsnc.tech/icons?icon=search",
-      "returns": "IconRecord",
-      "purpose": "Fetch one icon by name before installing it."
-    },
-    "responseFields": {
-      "id": "number",
-      "name": "string",
-      "componentName": "string",
-      "svg": "string",
-      "createdAt": "number",
-      "updatedAt": "number"
+  "usage": {
+    "componentType": "class",
+    "entryStyle": "namespace",
+    "entry": "Lib\\PPIcons",
+    "filePattern": "src/Lib/PPIcons/<ComponentName>.php",
+    "syntax": "jsx-like component tags"
+  },
+  "icons": [
+    {
+      "name": "search",
+      "componentName": "Search",
+      "file": "src/Lib/PPIcons/Search.php"
     }
-  }
+  ]
 }
 ```
 
 ### `.github/instructions/ppicons.instructions.md`
 
-This dedicated instruction file is generated for GitHub Copilot. It includes:
+This is the generated Copilot instruction file for projects using `ppicons`. It is refreshed from the current manifest and includes:
 
-- install commands for new icons
-- icon discovery API guidance
+- install commands for missing icons
+- catalog lookup guidance
 - project-specific usage examples
-- notes about the current icon directory and import entry
+- current icon directory and import-entry metadata
+- HTML-first `x-` tag examples aligned with generated usage
 
-The file includes instruction frontmatter plus a managed `ppicons` block so it can be refreshed safely without taking over `.github/copilot-instructions.md`.
+`ppicons` writes this generated Copilot context file under `.github/instructions/ppicons.instructions.md` and refreshes it from the current manifest.
 
-### `.github/copilot-instructions.md`
+## Catalog API
 
-This top-level file is left available for project-owned, always-on Copilot notes. `ppicons` does not generate or overwrite it.
+The CLI reads icon data from the remote catalog.
 
-If you want `ppicons` guidance for Copilot, use the dedicated `.github/instructions/ppicons.instructions.md` file instead.
-
-## Icon discovery API
-
-If you need to know which icon names are available before installation, use the remote catalog API.
-
-### Fetch all icons
+Fetch all icons:
 
 ```text
 GET https://ppicons.tsnc.tech/icons?icon=all
 ```
 
-This returns a JSON array of icon objects.
-
-### Fetch one icon by name
+Fetch one icon:
 
 ```text
 GET https://ppicons.tsnc.tech/icons?icon=search
 ```
 
-This returns a single JSON object.
-
-Example response:
+Single icon response shape:
 
 ```json
 {
@@ -278,15 +250,6 @@ Example response:
   "updatedAt": 1774923647142
 }
 ```
-
-Fields:
-
-- `id`: numeric record id
-- `name`: icon name used by `ppicons add <name>`
-- `componentName`: PascalCase component name that will be generated
-- `svg`: raw SVG markup returned by the catalog
-- `createdAt`: creation timestamp
-- `updatedAt`: update timestamp
 
 ## Troubleshooting
 
@@ -308,7 +271,7 @@ npx ppicons add search --force
 
 ### `ppicons update` says no icon components were found
 
-This means the target icon directory exists but no generated icon files matching the current language mode were found yet.
+This means the target icon directory exists but no generated files for the current language mode were found yet.
 
 Run an `add` command first:
 
@@ -326,9 +289,12 @@ Check the following:
 
 ## Contributing
 
-Pull requests and issues are welcome.
+If you change generator behavior, keep the generated contract aligned across the repo.
 
-If you change generation behavior, update the tests and keep the README aligned with the actual CLI behavior.
+- update the generator source in `src/`
+- update the matching tests in `tests/`
+- update this README when CLI behavior, output paths, or usage examples change
+- update committed `dist/` output so the published package matches the documented generator behavior
 
 ## License
 
