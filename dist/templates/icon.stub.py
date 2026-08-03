@@ -11,3 +11,4 @@ def __COMPONENT_NAME__(**props):
     }, props)
 
     return html(r"""__SVG_CODE__""")
+
