@@ -10,5 +10,5 @@ def __COMPONENT_NAME__(**props):
         "class": final_class
     }, props)
 
-    return html(r"""__SVG_CODE__""")
+    return html(r"""__SVG_CODE__""", attributes=attributes)
 
