@@ -1,5 +1,5 @@
 from casp.html_attrs import get_attributes, merge_classes
-from casp.component_decorator import component
+from casp.component_decorator import component, html
 
 
 @component
@@ -10,4 +10,4 @@ def __COMPONENT_NAME__(**props):
         "class": final_class
     }, props)
 
-    return f'__SVG_CODE__'
+    return html(r"""__SVG_CODE__""")
