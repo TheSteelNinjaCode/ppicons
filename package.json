@@ -1,6 +1,6 @@
 {
   "name": "ppicons",
-  "version": "0.5.4",
+  "version": "0.5.5",
   "description": "A package for generating Prisma PHP icons",
   "main": "index.js",
   "scripts": {
@@ -25,18 +25,18 @@
   "author": "Jefferson Abraham Omier <thesteelninjacode@gmail.com>",
   "license": "MIT",
   "type": "module",
-  "devDependencies": {
-    "@types/fs-extra": "^11.0.4",
-    "@types/node": "^26.1.2",
-    "@types/prompts": "^2.4.9",
-    "eslint": "^10.8.0",
-    "typescript": "^7.0.2"
-  },
   "dependencies": {
     "chalk": "^6.0.0",
     "change-case": "^5.4.4",
     "fs-extra": "^11.4.0",
     "node-fetch": "^3.3.2",
     "prompts": "^2.4.2"
+  },
+  "devDependencies": {
+    "@types/fs-extra": "^11.0.4",
+    "@types/node": "^26.1.2",
+    "@types/prompts": "^2.4.9",
+    "eslint": "^10.8.0",
+    "typescript": "^7.0.2"
   }
 }
