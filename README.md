@@ -16,7 +16,7 @@ The current component contract is HTML-first usage with `x-` tags:
 - Generates Python icon components for Caspian projects.
 - Supports single-icon installs, multi-icon installs, and full-catalog generation.
 - Updates already-installed icons by reading the generated component filenames.
-- Refreshes `ppicons.json` and `.github/instructions/ppicons.instructions.md` after successful add or update runs.
+- Refreshes `ppicons.json`, `.github/instructions/ppicons.instructions.md`, and `AGENTS.md` after successful add or update runs.
 - Keeps generated icon usage aligned with HTML-first `x-` tag output.
 
 ## Requirements
@@ -141,16 +141,23 @@ use Lib\PPIcons\{ArrowRight, Mail, UserRound};
 
 ### Caspian
 
-Import the generated components in the template, then render them with the same `x-` tags.
+Import generated components from the Python module that authors their `x-` tags. Caspian has no HTML-sidecar or comment import syntax.
 
-```html
-<!-- @import { Search, ArrowRight } from ../../lib/ppicons -->
+```python
+from casp.component_decorator import component, html
+from src.lib.ppicons import ArrowRight, Search
 
-<x-search />
-<x-arrow-right class="size-4" />
+@component
+def icon_actions():
+  return html(r"""
+  <div>
+    <x-search />
+    <x-arrow-right class="size-4" />
+  </div>
+  """)
 ```
 
-Adjust the relative import path so it points to `src/lib/ppicons` from the current template.
+Use `html(r"""...""")` for inline markup in the owning Python component, route, or layout.
 
 ## Metadata files
 
@@ -185,7 +192,8 @@ Example:
     "manifestFile": "ppicons.json",
     "componentsDirectory": "src/Lib/PPIcons",
     "iconsDirectory": "src/Lib/PPIcons",
-    "copilotInstructionsFile": ".github/instructions/ppicons.instructions.md"
+    "copilotInstructionsFile": ".github/instructions/ppicons.instructions.md",
+    "agentsFile": "AGENTS.md"
   },
   "commands": {
     "addOne": "npx ppicons add <icon-name>",
@@ -221,6 +229,10 @@ This is the generated Copilot instruction file for projects using `ppicons`. It 
 - HTML-first `x-` tag examples aligned with generated usage
 
 `ppicons` writes this generated Copilot context file under `.github/instructions/ppicons.instructions.md` and refreshes it from the current manifest.
+
+### `AGENTS.md`
+
+`ppicons` also writes the same managed AI context to `AGENTS.md` for agents that discover repository guidance there. It preserves any user-authored content outside the `<!-- ppicons:start -->` and `<!-- ppicons:end -->` block.
 
 ## Catalog API
 
