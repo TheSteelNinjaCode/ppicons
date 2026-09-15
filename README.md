@@ -167,7 +167,7 @@ Every successful `add` or `update` refreshes two project files.
 
 This is the machine-readable manifest for the installed icon set. It includes:
 
-- `schemaVersion: 6`
+- `schemaVersion: 7`
 - detected project type, framework, language, and config file
 - generated component and icon directories
 - canonical command strings for add/update workflows
@@ -179,7 +179,7 @@ Example:
 
 ```json
 {
-  "schemaVersion": 6,
+  "schemaVersion": 7,
   "generatedAt": "2026-04-28T00:00:00.000Z",
   "project": {
     "type": "prisma-php",
@@ -220,15 +220,14 @@ Example:
 
 ### `.github/instructions/ppicons.instructions.md`
 
-This is the generated Copilot instruction file for projects using `ppicons`. It is refreshed from the current manifest and includes:
+This is the generated Copilot instruction file for projects using `ppicons`. It includes:
 
+- the icons directory, generated file pattern, and import entry
+- how to check whether an icon exists: `ppicons.json` inventory, the icons directory, then the catalog API
 - install commands for missing icons
-- catalog lookup guidance
-- project-specific usage examples
-- current icon directory and import-entry metadata
-- HTML-first `x-` tag examples aligned with generated usage
+- project-specific usage examples with HTML-first `x-` tags
 
-`ppicons` writes this generated Copilot context file under `.github/instructions/ppicons.instructions.md` and refreshes it from the current manifest.
+The guidance is intentionally stable: it points agents at `ppicons.json` and the icons directory instead of listing installed icons, so adding or updating icons only changes `ppicons.json`. The file is rewritten only when the generated guidance itself changes.
 
 ### `AGENTS.md`
 
